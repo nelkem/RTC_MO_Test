@@ -22,32 +22,40 @@ void setup() {
   delay(5000);
   Serial.begin(9600);
   Serial.println("RTC Pint Interrupt Test");
+  
   InitializeIO();
   InitializeRTC();
   Serial.print("Alarm set to go off every " + String(WakePeriodMin) + " min, ");
   Serial.println(String(WakePeriodSec) + " secs from starting time");
   delay(1000);
-  attachInterrupt(digitalPinToInterrupt(INT_PIN), wake, FALLING);
   Serial.println("Sleeping until interrupt...");
-  Serial.println(digitalPinToInterrupt(INT_PIN));
+  attachInterrupt(digitalPinToInterrupt(INT_PIN), wake, LOW);
 }
 
 void loop() {
-  LowPower.idle(IDLE_1);
-  //while(!TakeSampleFlag)
+  //LowPower.idle(IDLE_0);
+  while(!TakeSampleFlag)
     
 
   if(TakeSampleFlag){
-    clearAlarmFunction();
+
     Serial.begin(9600);
-    delay(50);
+    Serial.println("LED ON");
+    
+    Serial.println(digitalRead(INT_PIN));
+    clearAlarmFunction();
+    Serial.println(digitalRead(INT_PIN));
+    delay(1000);
     setAlarmFunction();
     delay(75);
+    
     TakeSampleFlag=false;
-    delay(1);
     Serial.println("Sleeping until interrupt...");
-    Serial.println(IDLE_0);
-    attachInterrupt(digitalPinToInterrupt(INT_PIN), wake, FALLING);
+    
+    attachInterrupt(digitalPinToInterrupt(INT_PIN), wake, LOW);
+    Serial.println("PREINIT IO: " + String(TakeSampleFlag));
+    InitializeIO();
+    Serial.println("FINAL CHECK: " + String(TakeSampleFlag) + "\n\n");
   }
 }
 
